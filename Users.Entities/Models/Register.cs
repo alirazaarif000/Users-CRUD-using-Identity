@@ -5,6 +5,7 @@ namespace Users.Entities.Models
 {
     public class Register
     {
+        [ValidateNever]
         public string Id { get; set; }
 
         [Required(ErrorMessage = "User Name is required")]
@@ -22,8 +23,5 @@ namespace Users.Entities.Models
 
         [ValidateNever]
         public IEnumerable<string> RoleList { get; set; }
-
-
-
     }
 }
