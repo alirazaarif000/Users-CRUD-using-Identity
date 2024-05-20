@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<IdentityUser>
+
+@{
+    ViewData["Title"] = "User";
+}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
+<script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+
+<h1>View Users</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create User</a>
+</p>
+<table class="table table-bordered table-striped" id="tbUser">
+    <thead class="bg-dark text-white">
+        <tr>
+          
+@*            <th>@Html.DisplayNameFor(model => model.First().UserName)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Email)</th>*@
+        </tr>
+    </thead>
+    <tbody>
+        @*@foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-primary">Detail</a>
+                    <form asp-action="Delete" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?');" />
+                    </form>
+                </td>
+            </tr>
+        }*@
+    </tbody>
+</table>
+
+<script type="text/javascript">
+var js = jQuery.noConflict(true);
+function funcEdit(id) {
+    window.location.href = "/user/Edit/?id=" + id;
+    }
+function funcDelete(id) {
+    window.location.href = "/user/Delete/?id=" + id;
+    }
+function funcDetail(id) {
+    window.location.href = "/user/Detail/?id=" + id;
+    }
+MainFunction();
+    function MainFunction() {
+    "use strict";
+    var GlobalVar = { isIntialized: false, UsersArray: [] }
+    js(document).ready(function () {
+        GetUsers();
+        function GetUsers() {
+            if (GlobalVar.isIntialized == false) {
+                GlobalVar.isIntialized = true;
+                $.ajax({
+                    type: "GET",
+                    url: "/User/GetAllUsers",
+                    success: function (data) {
+                        GlobalVar.UsersArray = data;
+                        console.log(GlobalVar.UsersArray);
+                        BindUserData();
+                    }
+                })
+            }
+        }
+    })
+    function BindUserData(){
+        if (GlobalVar.UsersArray.length > 0) {
+            js('#tbUser').DataTable({
+                    data: GlobalVar.UsersArray,
+                    columns: [
+                       { "title": "ID", "data": "id", "defaultContent": "", "visible": false },
+                        { "title": "User Name", "data": "userName", "defaultContent": "" },
+                        { "title": "Email", "data": "email", "defaultContent": "" },
+                        {
+                            "title": "Action",
+                            "searchable": false,
+                            "orderable": false,
+                            "render": function (data, type, row) {
+                                console.log(row);
+                                var editbtn= "<a class='btn btn-primary' onclick= 'funcEdit(\""+ row.id +"\")'>Edit</a>"
+                                var deletebtn= "<a class='btn btn-danger' onclick= 'funcDelete(\""+ row.id +"\")'>Delete</a>"
+                                var detailbtn= "<a class='btn btn-primary' onclick= 'funcDetail(\""+ row.id +"\")'>Detail</a>"
+                                return editbtn + " | "+ detailbtn + " | " + deletebtn;
+                            }
+                        }
+                    ]
+                });
+            }
+        }
+        
+}
+</script>
